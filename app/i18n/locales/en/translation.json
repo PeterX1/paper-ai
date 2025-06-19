@@ -25,6 +25,8 @@
   "Url": "Url",
   "配置选择器": "Configure Selector",
   "Upstream URL:": "Upstream URL:",
+  "Custom API URL:": "Custom API URL:",
+  "Load Models": "Load Models",
   "System Prompt(Paper2AI):": "System Prompt(Paper2AI):",
   "configurations": {
     "cocopilot-gpt4": "cocopilot-gpt4 (apiKey prefix with ghu, as GitHub does not allow uploading complete keys)",

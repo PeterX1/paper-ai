@@ -29,8 +29,7 @@ import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
   addReferencesRedux,
   setEditorContent,
-  setApiKey,
-  setUpsreamUrl,
+  setCustomModels,
 } from "@/app/store/slices/authSlice";
 import { setContentUpdatedFromNetwork } from "@/app/store/slices/stateSlice";
 //类型声明
@@ -78,6 +77,7 @@ const QEditor = ({ lng }) => {
   //读取redux中的API key
   const apiKey = useAppSelector((state: any) => state.auth.apiKey);
   const upsreamUrl = useAppSelector((state: any) => state.auth.upsreamUrl);
+  const customApiUrl = useAppSelector((state: any) => state.auth.customApiUrl);
   const isJumpToReference = useAppSelector(
     (state) => state.state.isJumpToReference
   );
@@ -112,6 +112,15 @@ const QEditor = ({ lng }) => {
     "gpt语言模型",
     "deepseek-chat"
   ); // 默认选项
+  const modelList = useAppSelector((state) => state.auth.customModels);
+  useEffect(() => {
+    if (!modelList || modelList.length === 0) {
+      const stored = localStorage.getItem("customModels");
+      if (stored) {
+        dispatch(setCustomModels(JSON.parse(stored)));
+      }
+    }
+  }, [dispatch]);
   const [generatedPaperNumber, setGeneratedPaperNumber] = useLocalStorage(
     "生成次数",
     1
@@ -253,14 +262,6 @@ const QEditor = ({ lng }) => {
   //   dispatch(setApiKey("sk-GHuPUV6ERD8wVmmr36FeB8D809D34d93Bb857c009f6aF9Fe"));
   //   dispatch(setUpsreamUrl("https://one.14790897.xyz"));
   // });
-  useEffect(() => {
-    if (upsreamUrl === "https://one.paperai.life"|| upsreamUrl === "https://one.14790897.xyz") {
-      dispatch(
-        setApiKey("sk-GHuPUV6ERD8wVmmr36FeB8D809D34d93Bb857c009f6aF9Fe")
-      );
-      dispatch(setUpsreamUrl("https://new.14790897.xyz"));
-    }
-  }, [upsreamUrl]);
   const handleTextChange = debounce(async function (delta, oldDelta, source) {
     if (source === "user") {
       // 获取编辑器内容
@@ -320,6 +321,7 @@ const QEditor = ({ lng }) => {
           selectedModel!,
           apiKey,
           upsreamUrl,
+          customApiUrl,
           prompt,
           cursorPosition!,
           true,
@@ -347,6 +349,7 @@ const QEditor = ({ lng }) => {
               selectedModel!,
               apiKey,
               upsreamUrl,
+              customApiUrl,
               prompt,
               null,
               false,
@@ -380,7 +383,8 @@ const QEditor = ({ lng }) => {
                   upsreamUrl,
                   selectedModel!,
                   topic,
-                  newController.signal
+                  newController.signal,
+                  customApiUrl
                 );
               rawData = relevantPapers;
             }
@@ -413,7 +417,8 @@ const QEditor = ({ lng }) => {
                   upsreamUrl,
                   selectedModel!,
                   topic,
-                  newController.signal
+                  newController.signal,
+                  customApiUrl
                 );
               rawData = relevantPapers;
             }
@@ -451,7 +456,8 @@ const QEditor = ({ lng }) => {
                   upsreamUrl,
                   selectedModel!,
                   topic,
-                  newController.signal
+                  newController.signal,
+                  customApiUrl
                 );
               rawData = relevantPapers;
             }
@@ -491,6 +497,7 @@ const QEditor = ({ lng }) => {
             selectedModel!,
             apiKey,
             upsreamUrl,
+            customApiUrl,
             systemPrompt,
             cursorPosition!,
             true,
@@ -590,13 +597,21 @@ const QEditor = ({ lng }) => {
           onChange={(e) => setSelectedModel(e.target.value)}
           className=" border border-gray-300 bg-white py-2 px-3 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 "
         >
-          {/* <option value="gpt-3.5-turbo">gpt-3.5-turbo</option> */}
-          <option value="gpt-4.1">gpt-4.1</option>
-          <option value="gemini-2.5-flash-preview-05-20">
-            gemini-2.5-flash-preview-05-20
-          </option>
-          <option value="deepseek-chat">deepseek-chat</option>
-          {/* <option value="grok">grok</option> */}
+          {modelList && modelList.length > 0 ? (
+            modelList.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))
+          ) : (
+            <>
+              <option value="gpt-4.1">gpt-4.1</option>
+              <option value="gemini-2.5-flash-preview-05-20">
+                gemini-2.5-flash-preview-05-20
+              </option>
+              <option value="deepseek-chat">deepseek-chat</option>
+            </>
+          )}
         </select>
         {/* 进行几轮生成 */}
         <input

@@ -25,6 +25,8 @@
   "Url": "论文网址",
   "配置选择器": "配置选择器",
   "Upstream URL:": "请求模型的URL:",
+  "Custom API URL:": "自定义API链接:",
+  "Load Models": "加载模型",
   "System Prompt(Paper2AI):": "系统提示(Paper2AI):",
 
   "configurations": {

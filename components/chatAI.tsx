@@ -24,10 +24,11 @@ const sendMessageToOpenAI = async (
   selectedModel: string,
   apiKey: string,
   upsreamUrl: string,
+  customApiUrl: string,
   prompt: string,
   cursorPosition: number | null,
   useEditorFlag = true, // 新增的标志，用于决定操作
-  signal: AbortSignal
+  signal?: AbortSignal
 ) => {
   //识别应该使用的模型
   let model = selectedModel;
@@ -76,10 +77,11 @@ const sendMessageToOpenAI = async (
   let response;
   let responseClone = null; // 用于保存响应内容的变量
   try {
-    response = await fetch(
-      (upsreamUrl || process.env.NEXT_PUBLIC_AI_URL) + "/v1/chat/completions",
-      requestOptions
-    );
+    const url =
+      customApiUrl && customApiUrl.trim() !== ""
+        ? customApiUrl
+        : (upsreamUrl || process.env.NEXT_PUBLIC_AI_URL) + "/v1/chat/completions";
+    response = await fetch(url, requestOptions);
     // 检查响应状态码是否为429
     if (response.status === 429) {
       // 可以在这里处理429错误，例如通过UI通知用户

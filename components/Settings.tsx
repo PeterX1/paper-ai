@@ -5,6 +5,8 @@ import { useAppDispatch, useAppSelector } from "@/app/store";
 import {
   setApiKey,
   setUpsreamUrl,
+  setCustomApiUrl,
+  setCustomModels,
   setSystemPrompt,
 } from "@/app/store/slices/authSlice";
 import {
@@ -71,6 +73,7 @@ const Settings = ({ lng }: { lng: string }) => {
   const dispatch = useAppDispatch();
   const apiKey = useAppSelector((state) => state.auth.apiKey);
   const upstreamUrl = useAppSelector((state) => state.auth.upsreamUrl);
+  const customApiUrl = useAppSelector((state) => state.auth.customApiUrl);
   const systemPrompt = useAppSelector((state) => state.auth.systemPrompt);
   const isJumpToReference = useAppSelector(
     (state) => state.state.isJumpToReference
@@ -81,7 +84,7 @@ const Settings = ({ lng }: { lng: string }) => {
   //state
   const [userConfigNumber, setUserConfigNumber] = useLocalStorage(
     "userConfigNumber",
-    "2"
+    "0"
   );
   const toggleSwitch = (currentState: any, setState: any) => {
     setState(!currentState);
@@ -167,6 +170,43 @@ const Settings = ({ lng }: { lng: string }) => {
             onChange={(event) => dispatch(setUpsreamUrl(event.target.value))}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
+        </div>
+        {/* custom-api-url */}
+        <div className="mb-4">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="custom-api-url"
+          >
+            {t("Custom API URL:")}
+          </label>
+          <input
+            id="custom-api-url"
+            type="text"
+            value={customApiUrl}
+            onChange={(event) => dispatch(setCustomApiUrl(event.target.value))}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                const res = await fetch(`${customApiUrl || upstreamUrl}/v1/models`, {
+                  headers: {
+                    Authorization: `Bearer ${apiKey}`,
+                  },
+                });
+                const data = await res.json();
+                const models = data.data?.map((m: any) => m.id) || [];
+                dispatch(setCustomModels(models));
+                localStorage.setItem("customModels", JSON.stringify(models));
+              } catch (e) {
+                console.error("Failed to load models", e);
+              }
+            }}
+            className="mt-2 bg-gray-300 hover:bg-gray-400 text-black font-bold py-1 px-2 rounded"
+          >
+            {t("Load Models")}
+          </button>
         </div>
         {/* systemPrompt */}
         <div className="mb-4">

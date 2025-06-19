@@ -75,7 +75,8 @@ export async function evaluateTopicMatch(
   upsreamUrl: string,
   selectedModel: string,
   topic: string,
-  signal: AbortSignal
+  signal?: AbortSignal,
+  customApiUrl = ""
 ): Promise<{ relevantPapers: string[]; nonRelevantPapers: string[] }> {
   const prompt =
     "请判断文献是否跟用户输入的主题相关,只需要返回true或false的数组";
@@ -116,6 +117,7 @@ export async function evaluateTopicMatch(
         selectedModel!,
         apiKey,
         upsreamUrl,
+        customApiUrl,
         prompt,
         null,
         false,

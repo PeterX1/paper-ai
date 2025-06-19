@@ -15,6 +15,8 @@ const authPersistConfig = {
     "referencesRedux",
     "editorContent",
     "upsreamUrl",
+    "customApiUrl",
+    "customModels",
     "systemPrompt",
   ],
 };
